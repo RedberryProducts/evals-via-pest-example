@@ -1,17 +1,25 @@
 <?php
 
+use App\Ai\Agents\SupportReplyAgent;
+use App\Ai\Agents\TicketTriageAgent;
 use Illuminate\Support\Facades\Route;
-use App\Ai\Agents\SupportAgent;
 
 Route::get('/', function () {
     return view('welcome');
 });
 
-
 Route::get('/case-1', function () {
-    $response1 = app(SupportAgent::class)->prompt('I want to delete my account');
-    $response2 = app(SupportAgent::class)->prompt("Remove my profile");
-    $response3 = app(SupportAgent::class)->prompt("Close my account");
+    $customerMessage = 'Hi, I was charged twice this month and I am really frustrated. Can someone check my account?';
 
-    dd($response1, $response2, $response3);
+    $triage = app(TicketTriageAgent::class, [
+        'customerIdentifier' => 'john@example.com',
+    ])->prompt($customerMessage);
+
+    $reply = app(SupportReplyAgent::class)->prompt($customerMessage);
+
+    return response()->json([
+        'message' => $customerMessage,
+        'triage' => $triage->toArray(),
+        'reply' => $reply->text,
+    ]);
 });
