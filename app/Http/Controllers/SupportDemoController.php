@@ -8,6 +8,7 @@ use App\Ai\Support\DemoSupportTickets;
 use App\Ai\Tools\CustomerLookupTool;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Concurrency;
 use Illuminate\Validation\Rule;
 use JsonException;
 use Throwable;
@@ -38,13 +39,18 @@ class SupportDemoController extends Controller
 
         $this->extendExecutionTime();
 
-        try {
-            $triage = TicketTriageAgent::make(
-                customerIdentifier: $ticket['customer_identifier'],
-            )->prompt($ticket['message'], timeout: self::AI_PROMPT_TIMEOUT_SECONDS);
+        $customerIdentifier = $ticket['customer_identifier'];
+        $customerMessage = $ticket['message'];
+        $timeout = self::AI_PROMPT_TIMEOUT_SECONDS;
 
-            $reply = SupportReplyAgent::make()
-                ->prompt($ticket['message'], timeout: self::AI_PROMPT_TIMEOUT_SECONDS);
+        try {
+            [$triage, $reply] = Concurrency::run([
+                static fn () => TicketTriageAgent::make(
+                    customerIdentifier: $customerIdentifier,
+                )->prompt($customerMessage, timeout: $timeout),
+                static fn () => SupportReplyAgent::make()
+                    ->prompt($customerMessage, timeout: $timeout),
+            ]);
         } catch (Throwable $exception) {
             report($exception);
 

@@ -5,9 +5,11 @@ namespace App\Ai\Agents;
 use App\Ai\Support\CustomerDirectory;
 use App\Ai\Tools\CustomerLookupTool;
 use Illuminate\Contracts\JsonSchema\JsonSchema;
+use Laravel\Ai\Attributes\MaxTokens;
 use Laravel\Ai\Attributes\Model;
 use Laravel\Ai\Attributes\Provider;
 use Laravel\Ai\Contracts\Agent;
+use Laravel\Ai\Contracts\HasProviderOptions;
 use Laravel\Ai\Contracts\HasStructuredOutput;
 use Laravel\Ai\Contracts\HasTools;
 use Laravel\Ai\Contracts\Tool;
@@ -16,8 +18,8 @@ use Laravel\Ai\Promptable;
 use Stringable;
 
 #[Provider(Lab::OpenAI)]
-#[Model('gpt-5-nano')]
-class TicketTriageAgent implements Agent, HasStructuredOutput, HasTools
+#[Model('gpt-5.4-nano-2026-03-17')]
+class TicketTriageAgent implements Agent, HasProviderOptions, HasStructuredOutput, HasTools
 {
     use Promptable;
 
@@ -73,5 +75,18 @@ INSTRUCTIONS;
         return [
             new CustomerLookupTool,
         ];
+    }
+
+    /**
+     * Get provider-specific generation options.
+     */
+    public function providerOptions(Lab|string $provider): array
+    {
+        return match ($provider) {
+            Lab::OpenAI => [
+                'reasoning' => ['effort' => 'low'],
+            ],
+            default => [],
+        };
     }
 }

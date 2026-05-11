@@ -8,6 +8,10 @@ use Laravel\Ai\Responses\Data\ToolResult;
 use Laravel\Ai\Responses\Data\Usage;
 use Laravel\Ai\Responses\StructuredTextResponse;
 
+beforeEach(function () {
+    config(['concurrency.default' => 'sync']);
+});
+
 it('renders the support demo tickets', function () {
     $response = $this->get(route('support-demo.index'));
 
