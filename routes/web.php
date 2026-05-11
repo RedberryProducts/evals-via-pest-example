@@ -2,11 +2,15 @@
 
 use App\Ai\Agents\SupportReplyAgent;
 use App\Ai\Agents\TicketTriageAgent;
+use App\Http\Controllers\SupportDemoController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('/support-demo', [SupportDemoController::class, 'index'])->name('support-demo.index');
+Route::post('/support-demo/triage', [SupportDemoController::class, 'triage'])->name('support-demo.triage');
 
 Route::get('/case-1', function () {
     $customerMessage = 'Hi, I was charged twice this month and I am really frustrated. Can someone check my account?';
