@@ -147,37 +147,33 @@ The hub should cover these public plugin features.
 
 ## Proposed Test Architecture
 
-Use two suites instead of one monolithic eval suite.
+Use a single unified evaluation suite (`evals`) designed for manual, opt-in execution only. This suite is strictly excluded from automated CI/GitHub Actions to prevent unexpected costs and token drain.
 
-### Suite 1: Local Deterministic Hub
+### Single Unified Suite: Evals Hub
 
-This suite should be safe to run in CI without API keys.
+Every phase test is written using real LLM-backed requests and assertions because AI agents cannot be truly evaluated without an LLM involved (even deterministic assertions require some initial LLM output to assert against).
 
-- Use Laravel AI fakes where possible.
-- Test plugin chaining and assertions against controlled responses.
-- Exercise deterministic, structured, tool, dataset, sampling, and result API features.
-- Avoid LLM judge calls unless the judge itself is faked or replaced with a custom local judge.
+To support development and budget management, the test suite supports two execution modes:
+1. **Fake/Mock Mode (Default):** Runs assertions against faked/recorded LLM outputs so developers can verify test logic, plugin plumbing, and assertions without burning API tokens.
+2. **Live LLM Mode:** Toggled on via an environment variable (`RUN_LIVE_EVALS=1`) to run assertions against live LLM model calls once implementation is completed.
 
-Suggested command:
+### Group-Based Filtering
 
-```bash
-php artisan test --testsuite=evals-local
-```
-
-### Suite 2: Live LLM Smoke Hub
-
-This suite should require provider credentials and be opt-in.
-
-- Use real `TicketTriageAgent` and `SupportReplyAgent` calls.
-- Cover `assertMeets`, scored judges, similarity checks, custom rubric prompts, and `judgeWith()`.
-- Keep tests small and low-count to control cost.
-- Skip when required provider env vars are absent.
-
-Suggested command:
+To prevent wasting tokens on running the entire suite, each phase's tests are tagged with a dedicated Pest group. This lets developers run only specific suites of interest:
 
 ```bash
-RUN_LIVE_EVALS=1 php artisan test --testsuite=evals-live
+# Run only tool assertions tests
+php artisan test --testsuite=evals --group=tools
+
+# Run only sampling tests
+php artisan test --testsuite=evals --group=sampling
 ```
+
+### CI and Manual Run Policy
+
+The evals suite is manual-run only. It must not run in automated CI environments (like GitHub Actions):
+- It is configured under a separate `<testsuite>` in `phpunit.xml` that is not part of default PHPUnit/Pest suite execution.
+- It requires manual invocation and explicit opt-in for live LLM mode.
 
 ## Proposed Hub Building Blocks
 
@@ -185,13 +181,28 @@ The detailed implementation plan for each building block lives in the phase docu
 
 | Building block | Purpose | Phase |
 | --- | --- | --- |
-| Existing support workflow agents | realistic product scenario for triage, replies, and customer lookup | phases 4 and 8 |
+| Existing support workflow agents | realistic product scenario for triage, replies, and customer lookup | phase 4 and 6 |
 | `SupportPolicyAgent` | local deterministic text and JSON assertion coverage | phase 2 |
 | `ContactExtractorAgent` | nested structured output assertion coverage | phase 3 |
 | `ToolWorkflowAgent` plus support tools | comprehensive tool assertion coverage | phase 4 |
 | `VariableReplyAgent` | sampling and minimum-pass examples | phase 5 |
 | custom judges and rubrics | local judge coverage and live rubric examples | phase 6 |
 | `DocumentReviewAgent` plus fixtures | attachment and dataset attachment coverage | phase 7 |
+
+## Agent Additions & Architecture
+
+Are the existing agents (`TicketTriageAgent` and `SupportReplyAgent`) enough to write all these test suites?
+
+While we could theoretically reuse the two existing agents with mock configurations for all tests, doing so would make the test suites highly convoluted, heavily coupled, and difficult to understand. 
+
+To provide clean, self-contained, and realistic examples for each plugin feature (such as nested structured output, tool sequence verification, multiple varied outputs for sampling, and document attachments), the plan introduces dedicated, lightweight, single-purpose agents in their respective phases:
+- **`SupportPolicyAgent` (Phase 2):** Simple agent for plain-text and JSON deterministic responses.
+- **`ContactExtractorAgent` (Phase 3):** Specifically designed to return a nested schema for structured output assertions.
+- **`ToolWorkflowAgent` (Phase 4):** Predictably invokes multiple tools to cover sequencing and count assertions.
+- **`VariableReplyAgent` (Phase 5):** Designed with faked responses of varying outcomes to demonstrate sampling and pass-rate thresholds.
+- **`DocumentReviewAgent` (Phase 7):** Handles document attachment reading and summarization.
+
+Each of these agents is introduced incrementally alongside its relevant test suite to keep the codebase modular, realistic, and highly educational.
 
 ## Phase Plan
 
@@ -204,8 +215,7 @@ Implementation details are split into small, verifiable phase documents:
 - [Phase 5: Sampling](testing-hub-plan/phase-05-sampling.md)
 - [Phase 6: Custom Judges And Rubrics](testing-hub-plan/phase-06-custom-judges-and-rubrics.md)
 - [Phase 7: Attachments](testing-hub-plan/phase-07-attachments.md)
-- [Phase 8: Live LLM Smoke Suite](testing-hub-plan/phase-08-live-llm-smoke-suite.md)
-- [Phase 9: Output And Documentation](testing-hub-plan/phase-09-output-and-documentation.md)
+- [Phase 8: Output And Documentation](testing-hub-plan/phase-08-output-and-documentation.md)
 
 Each phase should be independently reviewable and should include its own verification command.
 
@@ -215,7 +225,6 @@ Detailed file lists are owned by the phase documents. The target layout is:
 
 ```text
 tests/Evals/
-tests/EvalsLive/
 tests/Evals/Datasets/
 ```
 
@@ -237,11 +246,9 @@ tests/Evals/Datasets/
 
 ## Open Questions
 
-- Should local eval tests use Laravel AI fakes exclusively, or should some local tests use deterministic custom agents that never call a provider?
-- Should live eval tests target OpenAI only, or support any provider through `EVALS_JUDGE_PROVIDER` and `EVALS_JUDGE_MODEL`?
 - Should the hub pin model names in agents, or move demo model configuration into env variables to keep examples current?
 - Should this repo become an example app only, or also a compatibility test fixture consumed by the plugin repository CI?
 
 ## Recommendation
 
-Start with phases 1 through 4 in code. That will make the repository useful as a real testing hub without requiring API keys. Add the live LLM suite only after the local suite is stable, because live evals are valuable but should remain opt-in due to cost, latency, and provider variance.
+Implement all phases with a default faked/mocked toggle so developers can run checks instantly without spending tokens. Real LLM requests can be run on-demand by setting `RUN_LIVE_EVALS=1`.

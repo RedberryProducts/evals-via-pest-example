@@ -2,13 +2,14 @@
 
 ## Goal
 
-Cover every tool assertion with predictable multi-tool workflow behavior.
+Cover every tool assertion with predictable multi-tool workflow behavior (supporting both faked/mocked mode and live execution).
 
 ## Scope
 
 - Add small support workflow tools beyond `CustomerLookupTool`.
 - Add `ToolWorkflowAgent` that can call tools in a predictable sequence.
 - Add tests for tool matching by class, by name, arguments, closures, sequence, and counts.
+- Tag tests with the Pest group `tools` (e.g., `->group('tools')`).
 
 ## Files To Add Or Update
 
@@ -46,19 +47,25 @@ Tool arguments should include stable values such as:
 
 ## Acceptance Criteria
 
+- Tests run using faked/mocked LLM/tool call data by default (safe for token budgets/CI).
+- Setting `RUN_LIVE_EVALS=1` seamlessly switches the suite to run against live LLM providers and real tool executions.
 - Tests verify tool assertions by class and by string name.
 - Tests verify exact argument matching and closure-based matching.
 - Tests verify a subsequence of expected tools.
 - Tests verify exact, minimum, and maximum tool counts.
 - Tests verify a no-tool or tool-not-used path.
-- No live provider is required.
+- All tests belong to the `tools` group.
 
 ## Verification
 
 ```bash
-php artisan test --testsuite=evals-local --filter=ToolAssertionsTest
+# Run with faked LLM data (default)
+php artisan test --testsuite=evals --group=tools
+
+# Run with live LLM requests
+RUN_LIVE_EVALS=1 php artisan test --testsuite=evals --group=tools
 ```
 
 ## Notes
 
-Prefer small tools with in-memory data. This keeps test failures focused on plugin tool assertion behavior, not external service behavior.
+Prefer small tools with in-memory data. This keeps test failures focused on plugin tool assertion behavior, not external service behavior. All tests support the dual fake/live toggle.

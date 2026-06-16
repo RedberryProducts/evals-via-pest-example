@@ -2,7 +2,7 @@
 
 ## Goal
 
-Cover prompt attachments and dataset attachment descriptors.
+Cover prompt attachments and dataset attachment descriptors (supporting both faked/mocked mode and live execution).
 
 ## Scope
 
@@ -10,6 +10,7 @@ Cover prompt attachments and dataset attachment descriptors.
 - Add `DocumentReviewAgent`.
 - Add tests for fluent `attachments([...])` and inline prompt attachments.
 - Add dataset cases with attachment descriptors.
+- Tag tests with the Pest group `attachments` (e.g., `->group('attachments')`).
 
 ## Files To Add Or Update
 
@@ -37,16 +38,22 @@ For local tests, responses should be faked so the tests verify plugin attachment
 
 ## Acceptance Criteria
 
+- Tests run using faked/mocked LLM data by default (safe for token budgets/CI).
+- Setting `RUN_LIVE_EVALS=1` seamlessly switches the suite to run against live LLM providers.
 - Tests verify attachment cases load from JSON and XML.
 - Tests verify fluent and inline attachment APIs can execute with faked responses.
-- Tests do not require real provider file-upload support.
+- All tests belong to the `attachments` group.
 
 ## Verification
 
 ```bash
-php artisan test --testsuite=evals-local --filter=AttachmentsTest
+# Run with faked LLM data (default)
+php artisan test --testsuite=evals --group=attachments
+
+# Run with live LLM requests
+RUN_LIVE_EVALS=1 php artisan test --testsuite=evals --group=attachments
 ```
 
 ## Notes
 
-Use `.txt` fixtures unless there is a strong reason to add binary files. The plugin needs attachment API coverage; provider-specific media behavior belongs in live/manual docs.
+Use `.txt` fixtures unless there is a strong reason to add binary files. The plugin needs attachment API coverage. All tests support the dual fake/live toggle.

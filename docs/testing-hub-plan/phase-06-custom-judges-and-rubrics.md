@@ -2,14 +2,15 @@
 
 ## Goal
 
-Demonstrate reusable evaluation logic through local custom judges and LLM rubric classes.
+Demonstrate reusable evaluation logic through local custom judges, LLM rubric classes, and built-in LLM judge assertions (supporting both faked/mocked mode and live execution).
 
 ## Scope
 
 - Add local custom judges that do not call an AI provider.
 - Add rubric classes for live LLM judge examples.
-- Add local tests for `assertPasses(...)`.
-- Add opt-in or skipped tests that demonstrate rubric usage without requiring live credentials by default.
+- Add tests for `assertPasses(...)` with custom local judges.
+- Cover built-in LLM judge assertions like `assertMeets(...)`, `toMeet(...)`, `assertSimilar(...)`, `assertSimilarTo(...)`, scored rubrics, and custom prompts/instructions.
+- Tag tests with the Pest group `judges` (e.g., `->group('judges')`).
 
 ## Files To Add Or Update
 
@@ -18,6 +19,7 @@ Demonstrate reusable evaluation logic through local custom judges and LLM rubric
 - `app/Evals/Rubrics/SupportReplyQuality.php`
 - `app/Evals/Rubrics/TriageSafety.php`
 - `tests/Evals/CustomJudgesTest.php`
+- `tests/Evals/LlmJudgeAssertionsTest.php`
 
 ## Custom Judge Requirements
 
@@ -57,21 +59,33 @@ Demonstrate reusable evaluation logic through local custom judges and LLM rubric
 - `judge(...)` returning `JudgeResult`
 - `assertMeets(new Rubric)`
 - `toMeet(new Rubric)`
-- `judgeInstructions(...)` if not deferred to Phase 8
+- `assertMeets(string)`
+- `toMeet(string)`
+- `assertSimilarTo(...)`
+- `toBeSimilarTo(...)`
+- `assertSimilar(...)`
+- `toBeSimilar(...)`
+- `judgeWith(provider, model)`
+- `judgeInstructions(...)`
 
 ## Acceptance Criteria
 
-- Local custom judge tests run without API keys.
-- Tests assert on custom judge pass/fail reasoning through `JudgeResult`.
-- Rubric classes are available for the live suite.
-- Any test that calls a live LLM judge is skipped unless `RUN_LIVE_EVALS=1`.
+- Tests run using faked/mocked LLM data by default (safe for token budgets/CI).
+- Setting `RUN_LIVE_EVALS=1` seamlessly switches the suite to run against live LLM providers.
+- Local custom judge tests assert on custom judge pass/fail reasoning through `JudgeResult`.
+- Rubrics are verified as working and correct.
+- All tests belong to the `judges` group.
 
 ## Verification
 
 ```bash
-php artisan test --testsuite=evals-local --filter=CustomJudgesTest
+# Run with faked LLM data (default)
+php artisan test --testsuite=evals --group=judges
+
+# Run with live LLM requests
+RUN_LIVE_EVALS=1 php artisan test --testsuite=evals --group=judges
 ```
 
 ## Notes
 
-This phase separates local custom judge behavior from live LLM judge behavior. Rubrics are implementation-ready here, but the main live coverage is Phase 8.
+This phase unifies both local custom judges and live LLM judge assertions into a single testing group. All tests support the dual fake/live toggle.

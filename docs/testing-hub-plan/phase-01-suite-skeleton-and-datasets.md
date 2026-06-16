@@ -7,10 +7,11 @@ Create the eval hub test structure without adding new agent behavior yet.
 ## Scope
 
 - Add `tests/Evals/` as the home for plugin-hub tests.
-- Configure a local eval test suite in `phpunit.xml` named `evals-local`.
+- Configure a manual-only eval test suite in `phpunit.xml` named `evals` (strictly excluded from automated CI/default execution).
 - Add dataset fixture folders.
 - Add minimal JSON and XML eval cases that can be loaded by later phases.
 - Add a first dataset loader test that does not call an AI provider.
+- Tag dataset loader tests with the Pest group `datasets` (e.g., `->group('datasets')`).
 
 ## Files To Add Or Update
 
@@ -41,12 +42,13 @@ XML cases should cover:
 - `EvalCase::fromJson(...)` loads all JSON fixture variants.
 - `EvalCase::fromXml(...)` loads named XML cases.
 - `EvalCase::fromDirectory(...)` discovers both JSON and XML cases.
-- No test in this phase calls a live AI provider.
+- All tests belong to the `datasets` group.
+- The `evals` suite is excluded from default/CI runs.
 
 ## Verification
 
 ```bash
-php artisan test --testsuite=evals-local --filter=DatasetsTest
+php artisan test --testsuite=evals --group=datasets
 ```
 
 ## Notes

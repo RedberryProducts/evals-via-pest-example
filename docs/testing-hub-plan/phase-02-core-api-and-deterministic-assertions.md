@@ -2,7 +2,7 @@
 
 ## Goal
 
-Cover `evaluate()` entry forms and deterministic assertions with controlled local responses.
+Cover `evaluate()` entry forms and deterministic assertions with real agent and LLM-backed execution (supporting both faked/mocked mode and live execution).
 
 ## Scope
 
@@ -10,6 +10,7 @@ Cover `evaluate()` entry forms and deterministic assertions with controlled loca
 - Add tests for `evaluate()` with class string, constructor args, agent instance, and closure factory.
 - Add tests for `prompt()`, `whenPrompted()`, `run()`, `expected()`, and `withCase()`.
 - Add tests for deterministic string, length, JSON, type, equality, and `toBe()` assertions.
+- Tag tests with the Pest group `deterministic` (e.g., `->group('deterministic')`).
 
 ## Files To Add Or Update
 
@@ -56,17 +57,21 @@ It should produce examples for:
 
 ## Acceptance Criteria
 
-- Tests run without API keys.
+- Tests run using faked/mocked LLM data by default (safe for token budgets/CI).
+- Setting `RUN_LIVE_EVALS=1` seamlessly switches the suite to run against live LLM providers.
 - Tests demonstrate all supported `evaluate()` input styles.
-- Deterministic assertions are grouped into readable, focused tests.
-- Failures would clearly identify which assertion family regressed.
+- All tests belong to the `deterministic` group.
 
 ## Verification
 
 ```bash
-php artisan test --testsuite=evals-local --filter='CoreApiTest|DeterministicAssertionsTest'
+# Run with faked LLM data (default)
+php artisan test --testsuite=evals --group=deterministic
+
+# Run with live LLM requests
+RUN_LIVE_EVALS=1 php artisan test --testsuite=evals --group=deterministic
 ```
 
 ## Notes
 
-Keep this phase provider-free. Live provider/model override behavior belongs to Phase 8.
+All phases now support dual-mode execution (fake/live LLM toggles). This ensures developers can run, test, and release quickly while preserving the ability to run live end-to-end evaluations on-demand.

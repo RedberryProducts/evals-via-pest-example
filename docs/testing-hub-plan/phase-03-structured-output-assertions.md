@@ -2,7 +2,7 @@
 
 ## Goal
 
-Cover structured output assertions using nested, realistic support data.
+Cover structured output assertions using nested, realistic support data (supporting both faked/mocked mode and live execution).
 
 ## Scope
 
@@ -10,6 +10,7 @@ Cover structured output assertions using nested, realistic support data.
 - Add tests for structured array output and nested paths.
 - Reuse the `contact-extraction.case.json` dataset from Phase 1.
 - Verify `EvalResult` array access for structured output.
+- Tag tests with the Pest group `structured` (e.g., `->group('structured')`).
 
 ## Files To Add Or Update
 
@@ -52,17 +53,23 @@ Cover structured output assertions using nested, realistic support data.
 
 ## Acceptance Criteria
 
+- Tests run using faked/mocked LLM data by default (safe for token budgets/CI).
+- Setting `RUN_LIVE_EVALS=1` seamlessly switches the suite to run against live LLM providers.
 - Tests validate top-level and dot-notation nested keys.
 - Tests validate exact values for at least one nested field.
 - Tests show both fluent assertions and native Pest `expect()` against `run()` output.
-- No live provider is required.
+- All tests belong to the `structured` group.
 
 ## Verification
 
 ```bash
-php artisan test --testsuite=evals-local --filter=StructuredOutputAssertionsTest
+# Run with faked LLM data (default)
+php artisan test --testsuite=evals --group=structured
+
+# Run with live LLM requests
+RUN_LIVE_EVALS=1 php artisan test --testsuite=evals --group=structured
 ```
 
 ## Notes
 
-This phase should not add tool behavior. Tool output and invocation checks belong to Phase 4.
+This phase should not add tool behavior. Tool output and invocation checks belong to Phase 4. All tests support the dual fake/live toggle.
