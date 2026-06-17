@@ -234,7 +234,7 @@ tests/Evals/Datasets/
 | --- | --- | --- |
 | Core `evaluate()` API | `CoreApiTest` | none or helper fake agent |
 | Prompt overrides | `CoreApiTest` | provider/model-safe agents |
-| Attachments | `DatasetsTest`, `DocumentReviewAgentTest` | `DocumentReviewAgent`, fixture files |
+| Attachments | `DatasetsTest`, `AttachmentsTest` | `DocumentReviewAgent`, fixture files |
 | Deterministic assertions | `DeterministicAssertionsTest` | `SupportPolicyAgent` |
 | Structured assertions | `StructuredOutputAssertionsTest` | `ContactExtractorAgent` |
 | Tool assertions | `ToolAssertionsTest` | `ToolWorkflowAgent`, extra tools |
