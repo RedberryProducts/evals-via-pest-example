@@ -1,0 +1,4 @@
+{
+    "prompt": "I forgot my password and cannot log into my account. What should I do?",
+    "expected": "Please use the 'Forgot Password' link on the login page to receive a password reset email."
+}

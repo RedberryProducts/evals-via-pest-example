@@ -1,0 +1,4 @@
+{
+    "prompt": "I requested a refund for my subscription 3 days ago, but I haven't seen it in my bank account yet. Can you check?",
+    "expected": "Refunds typically take 5-10 business days to appear in your bank account depending on your financial institution."
+}

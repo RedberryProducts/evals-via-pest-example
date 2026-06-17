@@ -1,0 +1,8 @@
+{
+    "prompt": "Please extract the contact details from this text: 'My name is John Doe, email is john.doe@example.com and phone is +1-555-0199.'",
+    "expected": {
+        "name": "John Doe",
+        "email": "john.doe@example.com",
+        "phone": "+1-555-0199"
+    }
+}
