@@ -7,6 +7,12 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
+## Evals Plugin Testing Hub
+
+This application is being shaped into a comprehensive Laravel example and testing hub for [`redberry/pest-plugin-evals`](https://github.com/RedberryProducts/pest-plugin-evals).
+
+See [`docs/testing-hub-plan.md`](docs/testing-hub-plan.md) for the planned agents, fixtures, datasets, and eval suites needed to cover the plugin feature set.
+
 ## About Laravel
 
 Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
