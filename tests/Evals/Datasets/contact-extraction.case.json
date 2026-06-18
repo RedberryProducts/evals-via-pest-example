@@ -1,8 +1,16 @@
 {
-    "prompt": "Please extract the contact details from this text: 'My name is John Doe, email is john.doe@example.com and phone is +1-555-0199.'",
+    "prompt": "Please extract the contact details from this text: 'My name is John Carter, email is john@example.com and I need help with billing.'",
     "expected": {
-        "name": "John Doe",
-        "email": "john.doe@example.com",
-        "phone": "+1-555-0199"
+        "customer": {
+            "name": "John Carter",
+            "email": "john@example.com"
+        },
+        "ticket": {
+            "topic": "billing",
+            "priority": "high"
+        },
+        "risk": {
+            "level": "review_required"
+        }
     }
 }
