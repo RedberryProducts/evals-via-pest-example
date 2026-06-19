@@ -1,5 +1,5 @@
 {
-    "prompt": "Please extract the contact details from this text: 'My name is John Carter, email is john@example.com and I need help with billing.'",
+    "prompt": "Please extract the support triage data from this text: 'My name is John Carter, email is john@example.com, my billing charge looks wrong, and I need someone to review it.'",
     "expected": {
         "customer": {
             "name": "John Carter",

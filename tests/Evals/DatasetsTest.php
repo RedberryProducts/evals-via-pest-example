@@ -22,11 +22,13 @@ it('loads prompt-with-expected-structured-output JSON cases', function () {
     $case = EvalCase::fromJson('tests/Evals/Datasets/contact-extraction.case.json');
 
     expect($case)->toBeInstanceOf(EvalCase::class);
-    expect($case->prompt)->toBe("Please extract the contact details from this text: 'My name is John Doe, email is john.doe@example.com and phone is +1-555-0199.'");
+    expect($case->prompt)->toBe("Please extract the support triage data from this text: 'My name is John Carter, email is john@example.com, my billing charge looks wrong, and I need someone to review it.'");
     expect($case->expected)->toBeArray();
-    expect($case->expected['name'])->toBe('John Doe');
-    expect($case->expected['email'])->toBe('john.doe@example.com');
-    expect($case->expected['phone'])->toBe('+1-555-0199');
+    expect($case->expected['customer']['name'])->toBe('John Carter');
+    expect($case->expected['customer']['email'])->toBe('john@example.com');
+    expect($case->expected['ticket']['topic'])->toBe('billing');
+    expect($case->expected['ticket']['priority'])->toBe('high');
+    expect($case->expected['risk']['level'])->toBe('review_required');
 })->group('datasets');
 
 it('loads named XML cases', function () {
