@@ -1,0 +1,4 @@
+Billing screenshot notes:
+- The screenshot shows a duplicate charge on the customer's card statement.
+- The customer circled the second charge and asked for a review.
+- Support should check billing history and escalate if the duplicate charge is confirmed.

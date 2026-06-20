@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<evalset name="document-workflows">
+    <case name="policy_summary">
+        <prompt>Summarize the attached refund policy.</prompt>
+        <expected>The attached refund policy confirms refunds are available within 14 days and explains the refund window.</expected>
+        <attachments>
+            <attachment type="document" source="path" path="tests/Evals/Datasets/attachments/refund-policy.txt" />
+        </attachments>
+    </case>
+    <case name="general_review">
+        <prompt>Give a short general support summary.</prompt>
+        <expected>The general review case is a short support summary with no attachment-specific details.</expected>
+    </case>
+</evalset>

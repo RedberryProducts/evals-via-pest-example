@@ -53,13 +53,16 @@ it('auto-discovers both JSON and XML cases from a directory', function () {
     $cases = EvalCase::fromDirectory('tests/Evals/Datasets');
 
     expect($cases)->toBeArray();
-    expect($cases)->toHaveCount(6);
+    expect($cases)->toHaveCount(9);
     expect($cases)->toHaveKeys([
         'prompt-only-haiku',
         'support-refund',
         'support-login',
         'contact-extraction',
+        'document-review',
         'refund_request',
         'general_query',
+        'policy_summary',
+        'general_review',
     ]);
 })->group('datasets');
