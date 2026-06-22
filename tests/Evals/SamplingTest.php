@@ -7,8 +7,6 @@ use Redberry\Evals\EvalContext;
 use Redberry\Evals\EvalResult;
 use Redberry\Evals\JudgeResult;
 use Redberry\Evals\SampleResults;
-use Laravel\Ai\Files;
-
 
 it('supports repeated sampled deterministic assertions', function () {
     fakeAgentResponseIfLiveDisabled(VariableReplyAgent::class, [
@@ -67,12 +65,7 @@ it('exposes sample results from run and judge', function () {
         'Our refund window is 14 days.',
     ]);
 
-    $refundPolicy = base_path('tests/Evals/Datasets/attachments/refund-policy.txt');
-
     $samples = evaluate(VariableReplyAgent::class)
-        ->attachments([
-            Files\Document::fromPath($refundPolicy),
-        ])
         ->prompt('Summarize the refund policy briefly.')
         ->samples(2)
         ->run();
