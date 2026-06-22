@@ -22,7 +22,7 @@ it('asserts tool usage, sequence, and counts for billing workflows', function ()
             collect([
                 new ToolCall('call_1', 'CustomerLookupTool', [
                     'customer_identifier' => 'john@example.com',
-                    'lookup_by' => 'auto',
+                    'lookup_by' => 'email',
                 ]),
                 new ToolCall('call_2', 'BillingHistoryTool', [
                     'customer_identifier' => 'john@example.com',
@@ -36,7 +36,7 @@ it('asserts tool usage, sequence, and counts for billing workflows', function ()
             collect([
                 new ToolResult('call_1', 'CustomerLookupTool', [
                     'customer_identifier' => 'john@example.com',
-                    'lookup_by' => 'auto',
+                    'lookup_by' => 'email',
                 ], json_encode([
                     'matched' => true,
                     'customer_id' => 'cus_1001',
@@ -83,7 +83,7 @@ it('asserts tool usage, sequence, and counts for billing workflows', function ()
         ->prompt('Customer john@example.com says they were charged twice and need a refund.')
         ->assertToolUsed(CustomerLookupTool::class, [
             'customer_identifier' => 'john@example.com',
-            'lookup_by' => 'auto',
+            'lookup_by' => 'email',
         ])
         ->assertToolUsed(BillingHistoryTool::class, function (ToolInvocation $invocation): bool {
             $result = json_decode((string) $invocation->result, true, flags: JSON_THROW_ON_ERROR);

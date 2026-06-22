@@ -41,13 +41,13 @@ it('renders triage output reply and customer lookup tool usage', function () {
             collect([
                 new ToolCall('call_1', 'CustomerLookupTool', [
                     'customer_identifier' => 'john@example.com',
-                    'lookup_by' => 'auto',
+                    'lookup_by' => 'email',
                 ]),
             ]),
             collect([
                 new ToolResult('call_1', 'CustomerLookupTool', [
                     'customer_identifier' => 'john@example.com',
-                    'lookup_by' => 'auto',
+                    'lookup_by' => 'email',
                 ], json_encode([
                     'matched' => true,
                     'customer_id' => 'cus_1001',
