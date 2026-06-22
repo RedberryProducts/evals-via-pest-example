@@ -12,7 +12,7 @@ return [
     */
     'judge' => [
         'provider' => env('EVALS_JUDGE_PROVIDER', 'openai'),
-        'model' => env('EVALS_JUDGE_MODEL', 'gpt-4o-mini'),
+        'model' => env('EVALS_JUDGE_MODEL', 'gpt-5.4-nano-2026-03-17'),
         'default_threshold' => 80,
     ],
 

@@ -49,7 +49,15 @@
         ],
         "test": [
             "@php artisan config:clear --ansi @no_additional_args",
-            "@php artisan test"
+            "vendor/bin/pest --exclude-group=evals --compact"
+        ],
+        "test:evals": [
+            "@php artisan config:clear --ansi @no_additional_args",
+            "vendor/bin/pest --group=evals --compact --parallel --processes=2"
+        ],
+        "test:evals:update-shards": [
+            "@php artisan config:clear --ansi @no_additional_args",
+            "vendor/bin/pest --group=evals --compact --update-shards"
         ],
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
