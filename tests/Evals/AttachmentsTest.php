@@ -6,13 +6,11 @@ use Redberry\Evals\EvalCase;
 use Redberry\Evals\EvalResult;
 
 it('supports fluent attachments, inline prompt attachments, and eval cases', function () {
-    if (! env('RUN_LIVE_EVALS')) {
-        DocumentReviewAgent::fake([
-            'The attached refund policy confirms refunds are available within 14 days of purchase.',
-            'The attached billing screenshot suggests a duplicate charge that needs review.',
-            'The attached refund policy confirms refunds are available within 14 days of purchase.',
-        ])->preventStrayPrompts();
-    }
+    fakeAgentResponseIfLiveDisabled(DocumentReviewAgent::class, [
+        'The attached refund policy confirms refunds are available within 14 days of purchase.',
+        'The attached billing screenshot suggests a duplicate charge that needs review.',
+        'The attached refund policy confirms refunds are available within 14 days of purchase.',
+    ]);
 
     $refundPolicy = base_path('tests/Evals/Datasets/attachments/refund-policy.txt');
     $billingScreenshot = base_path('tests/Evals/Datasets/attachments/billing-screenshot.txt');
@@ -49,13 +47,11 @@ it('supports fluent attachments, inline prompt attachments, and eval cases', fun
 })->group('attachments');
 
 it('loads attachment datasets and forwards them through withCase', function () {
-    if (! env('RUN_LIVE_EVALS')) {
-        DocumentReviewAgent::fake([
-            'The attached refund policy confirms refunds are available within 14 days and explains the refund window.',
-            'The attached refund policy confirms refunds are available within 14 days and explains the refund window.',
-            'The general review case is a short support summary with no attachment-specific details.',
-        ])->preventStrayPrompts();
-    }
+    fakeAgentResponseIfLiveDisabled(DocumentReviewAgent::class, [
+        'The attached refund policy confirms refunds are available within 14 days and explains the refund window.',
+        'The attached refund policy confirms refunds are available within 14 days and explains the refund window.',
+        'The general review case is a short support summary with no attachment-specific details.',
+    ]);
 
     $jsonCase = EvalCase::fromJson('tests/Evals/Datasets/document-review.case.json');
     $xmlCases = EvalCase::fromXml('tests/Evals/Datasets/document-workflows.case.xml');
