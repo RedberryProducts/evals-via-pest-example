@@ -33,6 +33,21 @@ expect()->extend('toBeOne', function () {
     return $this->toBe(1);
 });
 
+function fakeAgentResponseIfLiveDisabled(string $agentClass, mixed $responses = null): void
+{
+    if (env('RUN_LIVE_EVALS')) {
+        return;
+    }
+
+    if ($responses === null) {
+        $agentClass::fake()->preventStrayPrompts();
+
+        return;
+    }
+
+    $agentClass::fake($responses)->preventStrayPrompts();
+}
+
 /*
 |--------------------------------------------------------------------------
 | Functions

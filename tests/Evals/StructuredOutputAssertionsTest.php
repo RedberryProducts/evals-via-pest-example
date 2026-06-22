@@ -19,9 +19,7 @@ test('structured output assertions support nested data', function () {
         ],
     ];
 
-    if (! env('RUN_LIVE_EVALS')) {
-        ContactExtractorAgent::fake([$expected, $expected]);
-    }
+    fakeAgentResponseIfLiveDisabled(ContactExtractorAgent::class, [$expected, $expected]);
 
     $result = evaluate(ContactExtractorAgent::class)
         ->prompt("Please extract the support triage data from this text: 'My name is John Carter, email is john@example.com, my billing charge looks wrong, and I need someone to review it.'")
@@ -60,9 +58,7 @@ test('structured output datasets can be loaded and inspected', function () {
         ],
     ];
 
-    if (! env('RUN_LIVE_EVALS')) {
-        ContactExtractorAgent::fake([$expected]);
-    }
+    fakeAgentResponseIfLiveDisabled(ContactExtractorAgent::class, [$expected]);
 
     $case = EvalCase::fromJson('tests/Evals/Datasets/contact-extraction.case.json');
 

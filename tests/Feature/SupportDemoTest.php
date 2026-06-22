@@ -25,7 +25,7 @@ it('renders the support demo tickets', function () {
 });
 
 it('renders triage output reply and customer lookup tool usage', function () {
-    TicketTriageAgent::fake([
+    fakeAgentResponseIfLiveDisabled(TicketTriageAgent::class, [
         (new StructuredTextResponse(
             [
                 'category' => 'billing',
@@ -61,11 +61,11 @@ it('renders triage output reply and customer lookup tool usage', function () {
                 ], JSON_THROW_ON_ERROR)),
             ]),
         ),
-    ])->preventStrayPrompts();
+    ]);
 
-    SupportReplyAgent::fake([
+    fakeAgentResponseIfLiveDisabled(SupportReplyAgent::class, [
         'Hi, sorry about this. Please send the transaction ID and our team will review it. Here is what helps: - Transaction ID - Payment email',
-    ])->preventStrayPrompts();
+    ]);
 
     $response = $this->post(route('support-demo.triage'), [
         'ticket_id' => 'billing-failed-charge',
@@ -91,11 +91,11 @@ it('requires a known demo ticket', function () {
 });
 
 it('renders an error state when the ai provider fails', function () {
-    TicketTriageAgent::fake([
+    fakeAgentResponseIfLiveDisabled(TicketTriageAgent::class, [
         fn () => throw new RuntimeException('Provider timed out.'),
-    ])->preventStrayPrompts();
+    ]);
 
-    SupportReplyAgent::fake()->preventStrayPrompts();
+    fakeAgentResponseIfLiveDisabled(SupportReplyAgent::class);
 
     $response = $this->post(route('support-demo.triage'), [
         'ticket_id' => 'billing-failed-charge',

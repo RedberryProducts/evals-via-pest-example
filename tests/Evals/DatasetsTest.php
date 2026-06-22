@@ -1,6 +1,10 @@
 <?php
 
+use App\Ai\Agents\ContactExtractorAgent;
+use App\Ai\Agents\DocumentReviewAgent;
+use App\Ai\Agents\SupportPolicyAgent;
 use Redberry\Evals\EvalCase;
+use Redberry\Evals\EvalResult;
 
 it('loads prompt-only JSON cases', function () {
     $case = EvalCase::fromJson('tests/Evals/Datasets/prompt-only-haiku.case.json');
@@ -31,6 +35,46 @@ it('loads prompt-with-expected-structured-output JSON cases', function () {
     expect($case->expected['risk']['level'])->toBe('review_required');
 })->group('datasets');
 
+it('uses loaded JSON datasets against actual agents', function () {
+    fakeAgentResponseIfLiveDisabled(SupportPolicyAgent::class, [
+        'Refunds typically take 5-10 business days to appear in your bank account depending on your financial institution.',
+    ]);
+
+    fakeAgentResponseIfLiveDisabled(ContactExtractorAgent::class, [
+        [
+            'customer' => [
+                'name' => 'John Carter',
+                'email' => 'john@example.com',
+            ],
+            'ticket' => [
+                'topic' => 'billing',
+                'priority' => 'high',
+            ],
+            'risk' => [
+                'level' => 'review_required',
+            ],
+        ],
+    ]);
+
+    $refundCase = EvalCase::fromJson('tests/Evals/Datasets/support-refund.case.json');
+    $contactCase = EvalCase::fromJson('tests/Evals/Datasets/contact-extraction.case.json');
+
+    $refundResult = evaluate(SupportPolicyAgent::class)
+        ->withCase($refundCase)
+        ->run();
+
+    expect($refundResult)->toBeInstanceOf(EvalResult::class);
+    expect($refundResult->text)->toBe($refundCase->expected);
+
+    $contactResult = evaluate(ContactExtractorAgent::class)
+        ->withCase($contactCase)
+        ->run();
+
+    expect($contactResult)->toBeInstanceOf(EvalResult::class);
+    expect($contactResult->toArray())->toBe($contactCase->expected);
+    expect($contactResult['customer']['name'])->toBe('John Carter');
+})->group('datasets');
+
 it('loads named XML cases', function () {
     $cases = EvalCase::fromXml('tests/Evals/Datasets/support-workflows.case.xml');
 
@@ -47,6 +91,29 @@ it('loads named XML cases', function () {
     expect($queryCase)->toBeInstanceOf(EvalCase::class);
     expect($queryCase->prompt)->toBe('What are your operating hours?');
     expect($queryCase->expected)->toBeNull();
+})->group('datasets');
+
+it('uses loaded XML datasets against attachment-aware agents', function () {
+    fakeAgentResponseIfLiveDisabled(DocumentReviewAgent::class, [
+        'The attached refund policy confirms refunds are available within 14 days and explains the refund window.',
+        'The general review case is a short support summary with no attachment-specific details.',
+    ]);
+
+    $cases = EvalCase::fromXml('tests/Evals/Datasets/document-workflows.case.xml');
+
+    $policyResult = evaluate(DocumentReviewAgent::class)
+        ->withCase($cases['policy_summary'])
+        ->run();
+
+    expect($policyResult)->toBeInstanceOf(EvalResult::class);
+    expect($policyResult->text)->toBe($cases['policy_summary']->expected);
+
+    $generalResult = evaluate(DocumentReviewAgent::class)
+        ->withCase($cases['general_review'])
+        ->run();
+
+    expect($generalResult)->toBeInstanceOf(EvalResult::class);
+    expect($generalResult->text)->toBe($cases['general_review']->expected);
 })->group('datasets');
 
 it('auto-discovers both JSON and XML cases from a directory', function () {

@@ -8,19 +8,20 @@ use Laravel\Ai\StructuredAnonymousAgent;
 use Redberry\Evals\JudgeResult;
 
 it('supports binary rubric assertions and raw judge results', function () {
-    if (! env('RUN_LIVE_EVALS')) {
-        SupportReplyAgent::fake([
-            'I am sorry about the issue. Please send the transaction ID and payment email so we can investigate.',
-            'I am sorry about the issue. Please send the transaction ID and payment email so we can investigate.',
-            'I am sorry about the issue. Please send the transaction ID and payment email so we can investigate.',
-        ])->preventStrayPrompts();
+    fakeAgentResponseIfLiveDisabled(SupportReplyAgent::class, [
+        'I am sorry about the issue. Please send the transaction ID and payment email so we can investigate.',
+        'I am sorry about the issue. Please send the transaction ID and payment email so we can investigate.',
+        'I am sorry about the issue. Please send the transaction ID and payment email so we can investigate.',
+    ]);
 
-        StructuredAnonymousAgent::fake([
-            ['passed' => true, 'reasoning' => 'The reply is empathetic and asks for the next useful detail.'],
-            ['passed' => true, 'reasoning' => 'The reply is empathetic and asks for the next useful detail.'],
-            ['score' => 91, 'reasoning' => 'The reply shows good customer reassurance and safety handling.'],
-        ])->preventStrayPrompts();
-    }
+    fakeAgentResponseIfLiveDisabled(StructuredAnonymousAgent::class, [
+        ['passed' => true, 'reasoning' => 'The reply is empathetic and asks for the next useful detail.'],
+        ['passed' => true, 'reasoning' => 'The reply is empathetic and asks for the next useful detail.'],
+        ['score' => 91, 'reasoning' => 'The reply shows good customer reassurance and safety handling.'],
+    ]);
+
+    // The first two assertions are binary rubric checks.
+    // The third captures the raw judge response so we can inspect its score and reasoning.
 
     evaluate(SupportReplyAgent::class)
         ->prompt('My order was charged twice and I need help.')
@@ -47,21 +48,21 @@ it('supports binary rubric assertions and raw judge results', function () {
 })->group('judges');
 
 it('supports similarity aliases with expected values and custom judge settings', function () {
-    if (! env('RUN_LIVE_EVALS')) {
-        SupportPolicyAgent::fake([
-            'Our refund policy allows a full refund within 14 days of purchase.',
-            'Our refund policy allows a full refund within 14 days of purchase.',
-            'Our support hours are 9 AM to 5 PM EST, Monday through Friday.',
-            'Our support hours are 9 AM to 5 PM EST, Monday through Friday.',
-        ])->preventStrayPrompts();
+    fakeAgentResponseIfLiveDisabled(SupportPolicyAgent::class, [
+        'Our refund policy allows a full refund within 14 days of purchase.',
+        'Our refund policy allows a full refund within 14 days of purchase.',
+        'Our support hours are 9 AM to 5 PM EST, Monday through Friday.',
+        'Our support hours are 9 AM to 5 PM EST, Monday through Friday.',
+    ]);
 
-        StructuredAnonymousAgent::fake([
-            ['score' => 94, 'reasoning' => 'Semantically equivalent to the expected refund policy text.'],
-            ['score' => 93, 'reasoning' => 'Semantically equivalent to the expected refund policy text.'],
-            ['score' => 91, 'reasoning' => 'Semantically equivalent to the expected support hours text.'],
-            ['score' => 92, 'reasoning' => 'Semantically equivalent to the expected support hours text.'],
-        ])->preventStrayPrompts();
-    }
+    fakeAgentResponseIfLiveDisabled(StructuredAnonymousAgent::class, [
+        ['score' => 94, 'reasoning' => 'Semantically equivalent to the expected refund policy text.'],
+        ['score' => 93, 'reasoning' => 'Semantically equivalent to the expected refund policy text.'],
+        ['score' => 91, 'reasoning' => 'Semantically equivalent to the expected support hours text.'],
+        ['score' => 92, 'reasoning' => 'Semantically equivalent to the expected support hours text.'],
+    ]);
+
+    // These alias pairs differ only in whether the expected text is passed inline or via expected().
 
     evaluate(SupportPolicyAgent::class)
         ->prompt('Summarize the refund policy in one sentence.')

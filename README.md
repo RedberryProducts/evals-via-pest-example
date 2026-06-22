@@ -25,7 +25,35 @@ php artisan test --testsuite=evals
 Run a single group:
 
 ```bash
+php artisan test --testsuite=evals --group=deterministic
+```
+
+```bash
+php artisan test --testsuite=evals --group=structured
+```
+
+```bash
+php artisan test --testsuite=evals --group=tools
+```
+
+```bash
+php artisan test --testsuite=evals --group=sampling
+```
+
+```bash
+php artisan test --testsuite=evals --group=judges
+```
+
+```bash
 php artisan test --testsuite=evals --group=attachments
+```
+
+```bash
+php artisan test --testsuite=evals --group=datasets
+```
+
+```bash
+php artisan test --testsuite=evals --group=output
 ```
 
 Run live LLM evaluations on demand:

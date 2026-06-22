@@ -13,8 +13,8 @@ use Redberry\Evals\EvalResult;
 use Redberry\Evals\ToolInvocation;
 
 it('asserts tool usage, sequence, and counts for billing workflows', function () {
-    if (! env('RUN_LIVE_EVALS')) {
-        $response = (new TextResponse(
+    fakeAgentResponseIfLiveDisabled(ToolWorkflowAgent::class, [
+        (new TextResponse(
             'Customer is escalated to the billing team.',
             new Usage(promptTokens: 18, completionTokens: 22),
             new Meta('openai', 'gpt-5-nano'),
@@ -76,10 +76,8 @@ it('asserts tool usage, sequence, and counts for billing workflows', function ()
                     'reason' => 'escalate_to_supervisor',
                 ], JSON_THROW_ON_ERROR)),
             ]),
-        );
-
-        ToolWorkflowAgent::fake([$response])->preventStrayPrompts();
-    }
+        ),
+    ]);
 
     $result = evaluate(ToolWorkflowAgent::class)
         ->prompt('Customer john@example.com says they were charged twice and need a refund.')
@@ -119,15 +117,13 @@ it('asserts tool usage, sequence, and counts for billing workflows', function ()
 })->group('tools');
 
 it('asserts that feature requests do not use billing tools', function () {
-    if (! env('RUN_LIVE_EVALS')) {
-        ToolWorkflowAgent::fake([
-            new TextResponse(
-                'This is a feature request, so no tools are needed.',
-                new Usage(promptTokens: 12, completionTokens: 14),
-                new Meta('openai', 'gpt-5-nano'),
-            ),
-        ])->preventStrayPrompts();
-    }
+    fakeAgentResponseIfLiveDisabled(ToolWorkflowAgent::class, [
+        new TextResponse(
+            'This is a feature request, so no tools are needed.',
+            new Usage(promptTokens: 12, completionTokens: 14),
+            new Meta('openai', 'gpt-5-nano'),
+        ),
+    ]);
 
     $result = evaluate(ToolWorkflowAgent::class)
         ->prompt('Can you add dark mode to the dashboard?')

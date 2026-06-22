@@ -9,14 +9,12 @@ use Redberry\Evals\JudgeResult;
 use Redberry\Evals\SampleResults;
 
 it('supports repeated sampled deterministic assertions', function () {
-    if (! env('RUN_LIVE_EVALS')) {
-        VariableReplyAgent::fake([
-            'Our refund policy allows a full refund within 14 days.',
-            'Customers can request a refund within 14 days of purchase.',
-            'Support hours are 9 AM to 5 PM EST, Monday through Friday.',
-            'Our support team is available 9 AM to 5 PM EST on weekdays.',
-        ])->preventStrayPrompts();
-    }
+    fakeAgentResponseIfLiveDisabled(VariableReplyAgent::class, [
+        'Our refund policy allows a full refund within 14 days.',
+        'Customers can request a refund within 14 days of purchase.',
+        'Support hours are 9 AM to 5 PM EST, Monday through Friday.',
+        'Our support team is available 9 AM to 5 PM EST on weekdays.',
+    ]);
 
     evaluate(VariableReplyAgent::class)
         ->prompt('Tell me the refund policy in one short sentence.')
@@ -32,15 +30,14 @@ it('supports repeated sampled deterministic assertions', function () {
 })->group('sampling');
 
 it('allows a minimum pass count for sampled custom judges', function () {
-    if (! env('RUN_LIVE_EVALS')) {
-        VariableReplyAgent::fake([
-            'Refunds are available within 14 days of purchase.',
-            'Please contact support if you need help with your order.',
-            'We can help if you share more details about the issue.',
-        ])->preventStrayPrompts();
-    }
+    fakeAgentResponseIfLiveDisabled(VariableReplyAgent::class, [
+        'Refunds are available within 14 days of purchase.',
+        'Please contact support if you need help with your order.',
+        'We can help if you share more details about the issue.',
+    ]);
 
-    $judge = new class implements Judge {
+    $judge = new class implements Judge
+    {
         public function evaluate(EvalContext $context): JudgeResult
         {
             $text = strtolower($context->output);
@@ -63,12 +60,10 @@ it('allows a minimum pass count for sampled custom judges', function () {
 })->group('sampling');
 
 it('exposes sample results from run and judge', function () {
-    if (! env('RUN_LIVE_EVALS')) {
-        VariableReplyAgent::fake([
-            'Refunds are available within 14 days of purchase.',
-            'Our refund window is 14 days.',
-        ])->preventStrayPrompts();
-    }
+    fakeAgentResponseIfLiveDisabled(VariableReplyAgent::class, [
+        'Refunds are available within 14 days of purchase.',
+        'Our refund window is 14 days.',
+    ]);
 
     $samples = evaluate(VariableReplyAgent::class)
         ->prompt('Summarize the refund policy briefly.')

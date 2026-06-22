@@ -4,12 +4,16 @@ use App\Ai\Agents\ContactExtractorAgent;
 use App\Ai\Agents\SupportReplyAgent;
 use App\Evals\Judges\ContainsAllJudge;
 use App\Evals\Judges\StructuredFieldJudge;
+use App\Evals\Rubrics\SupportReplyQuality;
+use Laravel\Ai\StructuredAnonymousAgent;
 use Redberry\Evals\EvalContext;
+use Redberry\Evals\JudgeResult;
 
 it('uses a local text judge and returns reasoning', function () {
-    if (! env('RUN_LIVE_EVALS')) {
-        SupportReplyAgent::fake(fn () => 'I am sorry this happened. Please send the transaction ID and payment email so we can review it.')->preventStrayPrompts();
-    }
+    fakeAgentResponseIfLiveDisabled(
+        SupportReplyAgent::class,
+        fn () => 'I am sorry this happened. Please send the transaction ID and payment email so we can review it.',
+    );
 
     $result = evaluate(SupportReplyAgent::class)
         ->prompt('My card was charged twice and I need help.')
@@ -32,6 +36,26 @@ it('uses a local text judge and returns reasoning', function () {
         ->assertPasses($judge);
 })->group('judges');
 
+it('uses a live AI judge for rubric-based scoring', function () {
+    fakeAgentResponseIfLiveDisabled(SupportReplyAgent::class, [
+        'I am sorry this happened. Please send the transaction ID and payment email so we can review it.',
+    ]);
+
+    fakeAgentResponseIfLiveDisabled(StructuredAnonymousAgent::class, [
+        ['passed' => true, 'reasoning' => 'The reply is empathetic and asks for the next useful detail.'],
+    ]);
+
+    $judgeResult = evaluate(SupportReplyAgent::class)
+        ->prompt('My card was charged twice and I need help.')
+        ->judgeWith('openai', 'gpt-5-nano')
+        ->judgeInstructions('Treat payment safety and customer reassurance as the top priority.')
+        ->judge('The response should reassure the customer and ask for payment details.', new SupportReplyQuality);
+
+    expect($judgeResult)->toBeInstanceOf(JudgeResult::class);
+    expect($judgeResult->passed)->toBeTrue();
+    expect($judgeResult->reasoning)->toContain('empathetic');
+})->group('judges');
+
 it('uses a local structured judge against nested output', function () {
     $expected = [
         'customer' => [
@@ -47,9 +71,7 @@ it('uses a local structured judge against nested output', function () {
         ],
     ];
 
-    if (! env('RUN_LIVE_EVALS')) {
-        ContactExtractorAgent::fake(fn () => $expected)->preventStrayPrompts();
-    }
+    fakeAgentResponseIfLiveDisabled(ContactExtractorAgent::class, fn () => $expected);
 
     $result = evaluate(ContactExtractorAgent::class)
         ->prompt('Extract the support triage details for John Carter, john@example.com, billing issue, review required.')
