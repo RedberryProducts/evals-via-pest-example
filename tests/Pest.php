@@ -35,7 +35,7 @@ expect()->extend('toBeOne', function () {
 
 function fakeAgentResponseIfLiveDisabled(string $agentClass, mixed $responses = null): void
 {
-    if (env('RUN_LIVE_EVALS')) {
+    if (isLiveEvalsEnabled()) {
         return;
     }
 
@@ -46,6 +46,11 @@ function fakeAgentResponseIfLiveDisabled(string $agentClass, mixed $responses = 
     }
 
     $agentClass::fake($responses)->preventStrayPrompts();
+}
+
+function isLiveEvalsEnabled(): bool
+{
+    return filter_var(env('RUN_LIVE_EVALS'), FILTER_VALIDATE_BOOL);
 }
 
 /*

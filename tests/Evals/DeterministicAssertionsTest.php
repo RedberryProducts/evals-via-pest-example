@@ -4,11 +4,9 @@ use App\Ai\Agents\SupportPolicyAgent;
 
 // --- Test 1: String Content Assertions ---
 test('string content assertions', function () {
-    if (! env('RUN_LIVE_EVALS')) {
-        SupportPolicyAgent::fake([
-            'Our refund policy is extremely generous: customers can request a full refund within 14 days of purchase. Refunds typically take 5-10 business days to appear in your bank account.',
-        ]);
-    }
+    fakeAgentResponseIfLiveDisabled(SupportPolicyAgent::class, [
+        'Our refund policy is extremely generous: customers can request a full refund within 14 days of purchase. Refunds typically take 5-10 business days to appear in your bank account.',
+    ]);
 
     evaluate(SupportPolicyAgent::class)
         ->prompt('Tell me about the refund policy')
@@ -23,11 +21,9 @@ test('string content assertions', function () {
 
 // --- Test 2: Length Assertions ---
 test('length assertions', function () {
-    if (! env('RUN_LIVE_EVALS')) {
-        SupportPolicyAgent::fake([
-            'Our support hours are 9 AM to 5 PM EST, Monday through Friday.',
-        ]);
-    }
+    fakeAgentResponseIfLiveDisabled(SupportPolicyAgent::class, [
+        'Our support hours are 9 AM to 5 PM EST, Monday through Friday.',
+    ]);
 
     evaluate(SupportPolicyAgent::class)
         ->prompt('What are our operating hours?')
@@ -38,15 +34,13 @@ test('length assertions', function () {
 
 // --- Test 3: JSON Content Assertions ---
 test('json assertions', function () {
-    if (! env('RUN_LIVE_EVALS')) {
-        SupportPolicyAgent::fake([
-            json_encode([
-                'answer' => 'Our support hours are 9 AM to 5 PM EST, Monday through Friday.',
-                'category' => 'general',
-                'status' => 'active',
-            ]),
-        ]);
-    }
+    fakeAgentResponseIfLiveDisabled(SupportPolicyAgent::class, [
+        json_encode([
+            'answer' => 'Our support hours are 9 AM to 5 PM EST, Monday through Friday.',
+            'category' => 'general',
+            'status' => 'active',
+        ]),
+    ]);
 
     evaluate(SupportPolicyAgent::class)
         ->prompt('Provide a JSON response with our operating hours: general category, active status.')
@@ -57,11 +51,9 @@ test('json assertions', function () {
 
 // --- Test 4: Equality and Exact Assertions ---
 test('equality and exact assertions', function () {
-    if (! env('RUN_LIVE_EVALS')) {
-        SupportPolicyAgent::fake([
-            '9 AM to 5 PM EST',
-        ]);
-    }
+    fakeAgentResponseIfLiveDisabled(SupportPolicyAgent::class, [
+        '9 AM to 5 PM EST',
+    ]);
 
     evaluate(SupportPolicyAgent::class)
         ->prompt('What are our exact support hours?')
