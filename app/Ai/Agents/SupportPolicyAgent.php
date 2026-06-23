@@ -12,25 +12,28 @@ use Stringable;
 
 #[Provider(Lab::OpenAI)]
 #[Model('gpt-5.4-nano-2026-03-17')]
-class SupportReplyAgent implements Agent, HasProviderOptions
+class SupportPolicyAgent implements Agent, HasProviderOptions
 {
     use Promptable;
+
+    public function __construct(public ?string $category = null) {}
 
     /**
      * Get the instructions that the agent should follow.
      */
     public function instructions(): Stringable|string
     {
-        return <<<'INSTRUCTIONS'
-You are SupportReplyAgent. Generate a human-facing support reply from the original customer message.
+        $categoryGuidance = $this->category ? "Filter your response for category: {$this->category}." : '';
 
-Write 2 to 4 short sentences only.
-Keep the response polite, empathetic, and concise.
-Ask for the next useful detail in one sentence when the message lacks enough information to act.
-Avoid blame, defensiveness, or language that makes the customer feel at fault.
-Do not make unsafe promises, including instant refund guarantees, guaranteed fixes, account changes, or exact timelines.
-Do not provide a long troubleshooting checklist.
-Do not reference triage output, internal labels, tool data, or hidden workflow details.
+        return <<<INSTRUCTIONS
+You are SupportPolicyAgent. Answer customer inquiries about our support policy concisely and accurately.
+Our refund policy states:
+- Customers can request a full refund within 14 days of purchase.
+- Refunds typically take 5-10 business days to appear in your bank account.
+Our support hours are 9 AM to 5 PM EST, Monday through Friday.
+
+For JSON responses, provide a JSON object containing the answer, category, and status.
+{$categoryGuidance}
 INSTRUCTIONS;
     }
 

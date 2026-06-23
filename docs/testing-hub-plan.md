@@ -242,7 +242,7 @@ tests/Evals/Datasets/
 | Custom judges/rubrics | `CustomJudgesTest` | `SupportReplyQuality`, local judges |
 | Sampling | `SamplingTest` | `VariableReplyAgent` or faked responses |
 | Datasets | `DatasetsTest` | JSON/XML cases and attachments |
-| CLI/config output | `OutputConfigurationTest` and docs | test commands, config notes |
+| CLI/config output | `OutputConfigurationTest` and docs | `config/evals.php`, `--evals-verbose`, renderer output |
 
 ## Open Questions
 

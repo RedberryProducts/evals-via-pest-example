@@ -1,0 +1,11 @@
+{
+    "prompt": "Summarize the attached refund policy and say whether it should be escalated.",
+    "expected": "The attached refund policy confirms refunds are available within 14 days and explains the refund window.",
+    "attachments": [
+        {
+            "type": "document",
+            "source": "path",
+            "path": "tests/Evals/Datasets/attachments/refund-policy.txt"
+        }
+    ]
+}

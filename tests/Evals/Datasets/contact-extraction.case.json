@@ -1,0 +1,16 @@
+{
+    "prompt": "Please extract the support triage data from this text: 'My name is John Carter, email is john@example.com, my billing charge looks wrong, and I need someone to review it.'",
+    "expected": {
+        "customer": {
+            "name": "John Carter",
+            "email": "john@example.com"
+        },
+        "ticket": {
+            "topic": "billing",
+            "priority": "high"
+        },
+        "risk": {
+            "level": "review_required"
+        }
+    }
+}

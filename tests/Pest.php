@@ -16,7 +16,7 @@ use Tests\TestCase;
 
 pest()->extend(TestCase::class)
  // ->use(RefreshDatabase::class)
-    ->in('Feature');
+    ->in('Feature', 'Evals');
 
 /*
 |--------------------------------------------------------------------------
@@ -32,6 +32,26 @@ pest()->extend(TestCase::class)
 expect()->extend('toBeOne', function () {
     return $this->toBe(1);
 });
+
+function fakeAgentResponseIfLiveDisabled(string $agentClass, mixed $responses = null): void
+{
+    if (isLiveEvalsEnabled()) {
+        return;
+    }
+
+    if ($responses === null) {
+        $agentClass::fake()->preventStrayPrompts();
+
+        return;
+    }
+
+    $agentClass::fake($responses)->preventStrayPrompts();
+}
+
+function isLiveEvalsEnabled(): bool
+{
+    return filter_var(env('RUN_LIVE_EVALS'), FILTER_VALIDATE_BOOL);
+}
 
 /*
 |--------------------------------------------------------------------------

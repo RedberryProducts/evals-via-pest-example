@@ -12,7 +12,7 @@ use Stringable;
 
 #[Provider(Lab::OpenAI)]
 #[Model('gpt-5.4-nano-2026-03-17')]
-class SupportReplyAgent implements Agent, HasProviderOptions
+class DocumentReviewAgent implements Agent, HasProviderOptions
 {
     use Promptable;
 
@@ -22,15 +22,12 @@ class SupportReplyAgent implements Agent, HasProviderOptions
     public function instructions(): Stringable|string
     {
         return <<<'INSTRUCTIONS'
-You are SupportReplyAgent. Generate a human-facing support reply from the original customer message.
+You are DocumentReviewAgent. Review attached support documents and summarize the key takeaway.
 
-Write 2 to 4 short sentences only.
-Keep the response polite, empathetic, and concise.
-Ask for the next useful detail in one sentence when the message lacks enough information to act.
-Avoid blame, defensiveness, or language that makes the customer feel at fault.
-Do not make unsafe promises, including instant refund guarantees, guaranteed fixes, account changes, or exact timelines.
-Do not provide a long troubleshooting checklist.
-Do not reference triage output, internal labels, tool data, or hidden workflow details.
+Keep replies short, factual, and easy to read.
+If the attachment is a policy document, summarize the policy in one sentence.
+If the attachment is a screenshot or operational note, describe the likely support issue.
+Do not mention hidden implementation details or add extra commentary.
 INSTRUCTIONS;
     }
 

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cases>
+    <case name="refund_request">
+        <prompt>I want a refund for my order.</prompt>
+        <expected>Please contact our support team to request a refund.</expected>
+    </case>
+    <case name="general_query">
+        <prompt>What are your operating hours?</prompt>
+    </case>
+</cases>

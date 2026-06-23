@@ -5,7 +5,6 @@ namespace App\Ai\Agents;
 use App\Ai\Support\CustomerDirectory;
 use App\Ai\Tools\CustomerLookupTool;
 use Illuminate\Contracts\JsonSchema\JsonSchema;
-use Laravel\Ai\Attributes\MaxTokens;
 use Laravel\Ai\Attributes\Model;
 use Laravel\Ai\Attributes\Provider;
 use Laravel\Ai\Contracts\Agent;
