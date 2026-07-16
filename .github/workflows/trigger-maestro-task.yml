@@ -1,0 +1,31 @@
+name: Trigger Maestro Task on Main Merge
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - closed
+
+permissions:
+  contents: read
+
+jobs:
+  trigger-task:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Maestro task template
+        env:
+          MAESTRO_API_TOKEN: ${{ secrets.MAESTRO_API_TOKEN }}
+        run: |
+          set -euo pipefail
+          : "${MAESTRO_API_TOKEN:?Set the MAESTRO_API_TOKEN repository secret.}"
+
+          payload="$(jq -cn --rawfile event "$GITHUB_EVENT_PATH" '{context: {text: $event}}')"
+
+          curl --fail-with-body --silent --show-error \
+            --request POST 'https://cc.maestroerror.com/api/public/v1/task-templates/01KXP556K4A5T0JEWJBZZCQ71R/trigger' \
+            --header "Authorization: Bearer $MAESTRO_API_TOKEN" \
+            --header 'Content-Type: application/json' \
+            --data "$payload"
